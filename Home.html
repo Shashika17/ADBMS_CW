@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Fetch Data from MongoDB</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+<h1>Fetch Data from MongoDB</h1>
+
+<table id="data-table">
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>Email</th>
+    <th>Age</th>
+    <th>Actions</th> <!-- New column for buttons -->
+  </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+
+<!-- Edit Modal -->
+<div id="edit-modal" style="display: none;">
+  <h2>Edit User</h2>
+  <form id="edit-form">
+    <input type="hidden" id="user-id" name="user-id">
+    <label >Name:</label>
+    <input type="text" id="edit-name" name="name"><br>
+    <label >Email:</label>
+    <input type="email" id="edit-email" name="email"><br>
+    <label >Age:</label>
+    <input type="number" id="edit-age" name="age"><br>
+    <button type="submit">Save Changes</button>
+    <button type="button" onclick="closeEditModal()">Cancel</button>
+  </form>
+</div>
+
+<script>
+  // Function to delete a user
+  function deleteUser(userId) {
+    $.ajax({
+      url: `/users/${userId}`,
+      type: 'DELETE',
+      success: function(response) {
+        console.log(response);
+        // Refresh the table after deleting the user
+        fetchData();
+      }
+    });
+  }
+
+  // Function to open the edit modal with user data
+  function openEditModal(userId, name, email, age) {
+    $('#user-id').val(userId);
+    $('#edit-name').val(name);
+    $('#edit-email').val(email);
+    $('#edit-age').val(age);
+    $('#edit-modal').show();
+  }
+
+  // Function to close the edit modal
+  function closeEditModal() {
+    $('#edit-modal').hide();
+  }
+
+  // Function to update a user
+  function editUser(userId) {
+    const name = $('#edit-name').val();
+    const email = $('#edit-email').val();
+    const age = $('#edit-age').val();
+
+    $.ajax({
+      url: `/users/${userId}`,
+      type: 'PUT',
+      data: { name, email, age },
+      success: function(response) {
+        console.log(response);
+        closeEditModal();
+        // Refresh the table after updating the user
+        fetchData();
+      }
+    });
+  }
+
+  // Function to fetch data from the server
+  function fetchData() {
+    $.ajax({
+      url: '/fetch-data',
+      type: 'GET',
+      success: function(response) {
+        // Display the fetched data in the table
+        $('#data-table tbody').html(response);
+      },
+      error: function(error) {
+        console.log('Error fetching data from MongoDB:', error);
+      }
+    });
+  }
+
+  $(document).ready(function() {
+    // Initial fetch of data
+    fetchData();
+
+    // Event delegation for the "Update" buttons
+    $('#data-table').on('click', 'button[data-action="edit"]', function() {
+      const userId = $(this).data('id');
+      const name = $(this).closest('tr').find('td:eq(0)').text();
+      const email = $(this).closest('tr').find('td:eq(1)').text();
+      const age = $(this).closest('tr').find('td:eq(2)').text();
+      openEditModal(userId, name, email, age);
+    });
+
+    // Handle form submission for editing user
+    $('#edit-form').on('submit', function(event) {
+      event.preventDefault();
+      const userId = $('#user-id').val();
+      editUser(userId);
+    });
+  });
+</script>
+</body>
+</html>
