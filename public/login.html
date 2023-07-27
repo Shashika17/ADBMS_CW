@@ -8,17 +8,41 @@
             background-repeat: no-repeat;
             background-size: cover;
             font-family: Arial, sans-serif;
+            height: 100vh; /* Set body height to full viewport height */
+            overflow: hidden;
+            position: relative;/* Hide any overflowing elements, including snowflakes */
         }
 
         .container {
+            /* Other styles */
             max-width: 350px;
             margin: 0 auto;
             padding: 60px 30px;
-            background-color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.9);
             border-radius: 8px;
             box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
             margin-top: 100px;
+            position: relative; /* Ensure the container is relative */
+            z-index: 1; /* Ensure the container is above the snowflakes */
+        }
+        .snowflake {
+            position: absolute;
+            height: 10px;
+            width: 10px;
+            background: #fff;
+            border-radius: 50%;
+            opacity: 0.7;
+            animation: snowfall linear infinite;
+        }
+
+        @keyframes snowfall {
+            0% {
+                transform: translateY(-100%);
+            }
+            100% {
+                transform: translateY(100vh);
+            }
         }
 
         h1 {
@@ -101,6 +125,32 @@
     </style>
 </head>
 <body>
+<script>
+    // Snow animation
+    document.addEventListener('DOMContentLoaded', function () {
+        const body = document.querySelector('body'); // Get the body element
+        const container = document.querySelector('.container');
+
+        function createSnowflake() {
+            const snowflake = document.createElement('div');
+            snowflake.classList.add('snowflake');
+            snowflake.style.left = `${Math.random() * 100}vw`;
+            snowflake.style.animationDuration = `${Math.random() * 3 + 2}s`;
+            body.appendChild(snowflake); // Append snowflakes to the body
+
+            // Set initial position at the top of the container
+            snowflake.style.top = '-100px';
+
+            // Remove the snowflake when it reaches the bottom of the screen
+            snowflake.addEventListener('animationend', function () {
+                body.removeChild(snowflake); // Remove snowflakes from the body
+            });
+        }
+
+        // Create snowflakes periodically
+        setInterval(createSnowflake, 500);
+    });
+</script>
 <div class="container">
 
     <h1>Login</h1>
