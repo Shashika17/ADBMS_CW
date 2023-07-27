@@ -1,10 +1,13 @@
 const express = require('express');
+const cors = require('cors'); // Import the cors middleware
 const app = express();
 const port = 3000;
 const mongoose =require('mongoose');
 app.use(express.json()); // Add this line to parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // Add this line to parse URL-encoded request bodies
-
+app.use(express.static('public'));
+// Enable CORS for all origins
+app.use(cors());
 
 app.listen(port, '0.0.0.0', () => {
     console.log(`Server running at http://0.0.0.0:${port}/`);
@@ -70,7 +73,7 @@ app.post('/users', function(req, res) {
     newUser.save()
         .then(savedUser => {
            // res.send('User added successfully');
-            res.sendFile(__dirname + '/login.html');
+            res.sendFile(__dirname + '/public/login.html');
         })
         .catch(error => {
             res.status(500).send('Failed to add user');
@@ -101,7 +104,7 @@ app.get('/fetch-data', async (req, res) => {
         <td>${user.Age}</td>
         <td>
           <button onclick="deleteUser('${user._id}')">Delete</button>
-          <button onclick="editUser('${user._id}')">Update</button>
+          <button onclick="openEditModal('${user._id}','${user.Name}','${user.Gmail}','${user.Age}')">Update</button>
         </td>
       </tr>`).join('');
 
@@ -142,9 +145,9 @@ app.put('/users/:id', async (req, res) => {
 //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 //--------------------------------------
 app.get('/login', function(req, res) {
-    res.sendFile(__dirname + '/login.html');
+    res.sendFile(__dirname + '/public/login.html');
 });
 //---------------------------------------
 app.get('/Register', function(req, res) {
-    res.sendFile(__dirname + '/Register.html');
+    res.sendFile(__dirname + '/public/Register.html');
 });
